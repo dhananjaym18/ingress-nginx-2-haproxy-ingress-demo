@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: 2048-namespace
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deploy-2048
+  namespace: 2048-namespace
+  labels:
+    app: "2048"
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: "2048"
+  template:
+    metadata:
+      labels:
+        app: "2048"
+    spec:
+      containers:
+      - name: 2048-game
+        image: public.ecr.aws/l6m2t8p7/docker-2048:latest # Using a public 2048 game image
+        ports:
+        - containerPort: 80
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-2048
+  namespace: 2048-namespace
+spec:
+  selector:
+    app: "2048"
+  ports:
+    - protocol: TCP
+      port: 8084
+      targetPort: 80
+  type: ClusterIP
